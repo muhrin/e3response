@@ -47,7 +47,7 @@ module:
 
       - _target_: tensorial.gcnn.NodewiseLinear
         field: attributes
-        irreps_out: 16x0o + 16x0e + 16x1o + 16x1e
+        irreps_out: 16x0o + 16x0e + 16x1o + 16x1e + 8x2o + 8x2e
 
       - _target_: tensorial.gcnn.NequipLayer
         irreps_out: 16x0o + 16x0e + 16x1o + 16x1e
@@ -64,11 +64,6 @@ module:
       # Keep only scalars and reduce the number passing this point
       - _target_: tensorial.gcnn.NodewiseLinear
         irreps_out: 4x0e + 4x0o + 4x1e + 4x1o + 4x2e + 4x2o + 2x3o + 2x3e
-
-      # Per-atom Born effective charge tensor
-      - _target_: tensorial.gcnn.NodewiseLinear
-        irreps_out: 1x0e + 1x1e + 1x2e
-        out_field: predicted_born_charges
 
       # Per-atom Born effective charge tensor
       - _target_: tensorial.gcnn.NodewiseLinear
