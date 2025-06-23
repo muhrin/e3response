@@ -2,11 +2,10 @@
 
 mlflow:
   _target_: reax.loggers.mlflow.MLFlowLogger
-  # experiment_name: ""
-  # run_name: ""
-  tracking_uri: ${paths.log_dir}/mlflow/mlruns # run `mlflow ui` command inside the `logs/mlflow/` dir to open the UI
-  tags: null
-  # save_dir: "./mlruns"
+  experiment_name: e3response_QM9-NMR
+  run_name: run_nmr_dev
+  tracking_uri: http://127.0.0.1:5000
+  tags:
+    mlflow.user: ${oc.env:USER}
   prefix: ""
   artifact_location: null
-  # run_id: ""

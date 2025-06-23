@@ -47,9 +47,9 @@ from_data:
 # set False to skip model training
 train:
   min_epochs: 1 # prevents early stopping
-  max_epochs: 400
+  max_epochs: 500
   # perform a validation loop every N training epochs
-  check_val_every_n_epoch: 20
+  check_val_every_n_epoch: 1
 
 # evaluate on test set, using best model weights achieved during training
 # REAX chooses best weights based on the metric specified in checkpoint callback

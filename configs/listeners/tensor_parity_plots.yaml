@@ -1,0 +1,17 @@
+tensor_parity_plots:
+  _target_: reax.listeners.TensorParityPlots
+
+  # Optional: override which scalar keys to extract/compare
+  scalar_keys:
+    - sigma_xx
+    - sigma_yy
+    - sigma_zz
+    - sigma_iso
+    - delta_sigma
+    - eta
+    - frobenius_norm
+    - symmetric_part
+    - asymmetric_part
+    - eigenvalues
+
+  log_rank_zero_only: true  # Log only from rank 0
