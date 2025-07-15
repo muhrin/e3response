@@ -1,0 +1,5 @@
+_target_: e3response.data.csh_nmr.CshNmrDataModule
+r_max: ${r_max}
+batch_size: 16 # Needs to be divisible by the number of devices (e.g., if in a distributed setup)
+train_val_test_split: [0.80, 0.10, 0.10]
+limit: "only bulk"

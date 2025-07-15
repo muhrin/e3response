@@ -83,16 +83,16 @@ def train(cfg: omegaconf.DictConfig):
 
     if cfg.get("test"):
         _LOGGER.info("Starting testing!")
-        ckpt_path = trainer.checkpoint_listener.best_model_path
-        if ckpt_path == "":
-            _LOGGER.warning("Best ckpt not found! Using current weights for testing...")
-            ckpt_path = None
+        # ckpt_path = trainer.checkpoint_listener.best_model_path
+        # if ckpt_path == "":
+        #     _LOGGER.warning("Best ckpt not found! Using current weights for testing...")
+        #     ckpt_path = None
         trainer.test(
             model,
             datamodule=datamodule,
-            ckpt_path=ckpt_path,
+            # ckpt_path=ckpt_path,
         )
-        _LOGGER.info("Best ckpt path: %s", ckpt_path)
+        # _LOGGER.info("Best ckpt path: %s", ckpt_path)
 
     test_metrics = trainer.listener_metrics
 

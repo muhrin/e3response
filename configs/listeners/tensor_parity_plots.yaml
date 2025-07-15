@@ -14,4 +14,4 @@ tensor_parity_plots:
     - asymmetric_part
     - eigenvalues
 
-  log_rank_zero_only: true  # Log only from rank 0
+  log_rank_zero_only: true

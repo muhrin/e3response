@@ -1,5 +1,6 @@
 _target_: tensorial.ReaxModule
 
+<<<<<<< Updated upstream
 optimizer:
   _partial_: True
   _target_: optax.adam
@@ -9,6 +10,28 @@ scheduler:
   _target_: optax.schedules.cosine_decay_schedule
   init_value: 0.1
   decay_steps: 100
+=======
+metrics:
+    nmr_tensors_rmse:
+      _target_: tensorial.gcnn.graph_metric
+      metric: rmse
+      predictions: nodes.NMR_tensors_predicted
+      targets: nodes.NMR_tensors
+
+# mul: 8
+# node_feature_irreps: ${mul}x0o + ${mul}x0e + ${mul}x1o + ${mul}x1e + ${mul}x2o + ${mul}x2e + ${mul}x3o + ${mul}x3e
+# node_feature_irreps: 8x0o + 8x0e + 8x1o + 8x1e + 8x2o + 8x2e + 8x3o + 8x3e
+# NMR_irreps: 1x0e + 1x1e + 1x2e
+
+optimizer:
+  _target_: optax.nadamw
+  learning_rate: 0.01
+  # learning_rate:
+  #     _target_: optax.exponential_decay
+  #     init_value: 0.05
+  #     transition_steps: 500
+  #     decay_rate: 0.9
+>>>>>>> Stashed changes
 
 loss_fn:
   _target_: tensorial.gcnn.WeightedLoss
@@ -51,6 +74,7 @@ model:
 
     - _target_: tensorial.gcnn.NodewiseLinear
       field: attributes
+<<<<<<< Updated upstream
       irreps_out: 16x0o + 16x0e + 16x1o + 16x1e
 
     - _target_: tensorial.gcnn.NequipLayer
@@ -63,6 +87,20 @@ model:
 
     - _target_: tensorial.gcnn.NequipLayer
       irreps_out: 16x0o + 16x0e + 16x1o + 16x1e
+=======
+      irreps_out: 8x0o + 8x0e + 8x1o + 8x1e + 8x2o + 8x2e #+ 8x3o + 8x3e
+
+    - _target_: tensorial.gcnn.NequipLayer
+      irreps_out: 8x0o + 8x0e + 8x1o + 8x1e + 8x2o + 8x2e #+ 8x3o + 8x3e
+      avg_num_neighbours: ${from_data.avg_num_neighbours}
+
+    - _target_: tensorial.gcnn.NequipLayer
+      irreps_out: 8x0o + 8x0e + 8x1o + 8x1e + 8x2o + 8x2e #+ 8x3o + 8x3e
+      avg_num_neighbours: ${from_data.avg_num_neighbours}
+
+    - _target_: tensorial.gcnn.NequipLayer
+      irreps_out: 8x0o + 8x0e + 8x1o + 8x1e + 8x2o + 8x2e #+ 8x3o + 8x3e
+>>>>>>> Stashed changes
       avg_num_neighbours: ${from_data.avg_num_neighbours}
 
     # Keep only scalars and reduce the number passing this point
@@ -78,7 +116,14 @@ model:
       field: energy
       out_field: predicted_energy  # Global energy
 
+<<<<<<< Updated upstream
     # Per-atom induced magnetic field
     - _target_: tensorial.gcnn.NodewiseLinear
       irreps_out: 1x1o
       out_field: predicted_induced_field
+=======
+    # - _target_: tensorial.gcnn.IndexedRescale
+    #   num_types: ${from_data.n_elements}
+    #   field: nodes.NMR_tensors_predicted
+    #   index_field: nodes.species
+>>>>>>> Stashed changes

@@ -20,6 +20,8 @@ from tensorial import gcnn
 import tqdm
 from typing_extensions import override
 
+from e3response import keys
+
 __all__ = ("QM9NmrDataset", "QM9NmrDataModule")
 
 _LOGGER = logging.getLogger(__name__)
@@ -33,6 +35,15 @@ DATASET_URLS = {
     "acetone": "https://nomad-lab.eu/prod/rae/api/raw/query?dataset_id=RhoELQmVS2K0AxPHW0JFbw",
     "methanol": "https://nomad-lab.eu/prod/rae/api/raw/query?dataset_id=cMfYU0u1RcuA6P9uqwQXng",
     "DMSO": "https://nomad-lab.eu/prod/rae/api/raw/query?dataset_id=417HCiXDRhC22th2aE4Xzw",
+}
+
+# Nuclear magnetic moments dict
+mu_dict = {
+    "H": 2.792847351,  # 1H
+    "C": 0.702369,  # 13C
+    "N": -0.2830569,  # 15N
+    "O": -1.893543,  # 17O
+    "F": 2.628321,  # 19F
 }
 
 
@@ -76,9 +87,7 @@ class QM9NmrDataset(collections.abc.Sequence[jraph.GraphsTuple]):
         self._rmax = r_max
         self._data_dir: Final[str] = data_dir
         self._limit = limit
-        default_key = [
-            "NMR_tensors",
-        ]
+        default_keys = ["NMR_tensors", "mu"]
         possible_keys = [
             "ind",
             "N",
@@ -97,13 +106,13 @@ class QM9NmrDataset(collections.abc.Sequence[jraph.GraphsTuple]):
                 f"Invalid atom_keys: {invalid_keys}. " f"Allowed keys are: {possible_keys}"
             )
 
-        self._atom_keys = list(set(default_key).union(atom_keys or []))
+        self._atom_keys = list(set(default_keys).union(atom_keys or []))
 
         self._to_graph: Callable[[ase.Atoms], jraph.GraphsTuple] = functools.partial(
             gcnn.atomic.graph_from_ase,
             r_max=self._rmax,
-            # atom_include_keys=self._atom_keys,
             atom_include_keys=("numbers", *self._atom_keys),
+            global_include_keys=[keys.EXTERNAL_MAGNETIC_FIELD],
         )
 
         # Data
@@ -304,7 +313,12 @@ def get_structure_and_data_from_log(log_path: pathlib.Path) -> Optional[ase.Atom
         atoms.arrays["anisotropy"] = np.array(molecule_data["anisotropy"])
         atoms.arrays["eigenvalues"] = np.array(molecule_data["eigenvalues"])
 
-        # print(atoms.arrays["anisotropy"])
+        species = molecule_data["species"]
+        mu_values = np.array([mu_dict[s] for s in species])
+        atoms.arrays["mu"] = mu_values
+        atoms.arrays[keys.EXTERNAL_MAGNETIC_FIELD] = np.zeros(3)
+
+        # print(atoms.arrays["mu"])
 
         return atoms
 

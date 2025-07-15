@@ -7,8 +7,8 @@ defaults:
   - data: bto
   - model: nequip
   - listeners: default
-  - logger: csv # set logger here or use command line (e.g. `python train.py logger=tensorboard`)
-  - trainer: default
+  - logger: mlflow # set logger here or use command line (e.g. `python train.py logger=tensorboard`)
+  - trainer: gpu
   - paths: default
   - extras: default
   - hydra: default
@@ -46,17 +46,18 @@ from_data:
 
 # set False to skip model training
 train:
-  min_epochs: 1 # prevents early stopping
-  max_epochs: 500
+  min_epochs: 100 # prevents early stopping
+  max_epochs: 3000
   # perform a validation loop every N training epochs
-  check_val_every_n_epoch: 1
+  check_val_every_n_epoch: 10
+
 
 # evaluate on test set, using best model weights achieved during training
 # REAX chooses best weights based on the metric specified in checkpoint callback
-test:
+test: true
 
 # simply provide checkpoint path to resume training
 ckpt_path: null
 
 # seed for random number generators in jax, numpy and python.random
-seed: null
+seed: 42

@@ -1,0 +1,79 @@
+_target_: tensorial.ReaxModule
+
+metrics:
+    nmr_tensors_rmse:
+      _target_: tensorial.gcnn.graph_metric
+      metric: rmse
+      predictions: nodes.NMR_tensors_predicted
+      targets: nodes.NMR_tensors
+
+optimizer:
+  _target_: optax.adamw
+  # learning_rate: 0.01
+  learning_rate:
+    _target_: optax.exponential_decay
+    init_value: 0.001
+    transition_steps: 500
+    decay_rate: 0.9
+
+loss_fn:
+  _target_: tensorial.gcnn.Loss
+  field: nodes.NMR_tensors_predicted
+  target_field: nodes.NMR_tensors
+  reduction: "sum"
+
+model:
+  _target_: tensorial.nn.Sequential
+  layers:
+    - _target_: tensorial.gcnn.atomic.SpeciesTransform
+      atomic_numbers: ${from_data.atomic_numbers}
+
+    - _target_: tensorial.gcnn.NodewiseEncoding
+      attrs:
+        species:
+          _target_: tensorial.tensors.OneHot
+          num_classes: ${from_data.n_elements}
+        globals.external_magnetic_field:
+          _target_: tensorial.tensors.SphericalHarmonic
+          irreps: 0e + 1o
+          normalise: True
+
+    - _target_: tensorial.gcnn.EdgeVectors
+
+    - _target_: tensorial.gcnn.EdgewiseEncoding
+      attrs:
+        edge_vectors:
+          _target_: tensorial.tensors.SphericalHarmonic
+          irreps: 0e + 1o + 2e
+          normalise: True
+
+    - _target_: tensorial.gcnn.RadialBasisEdgeEncoding
+      r_max: ${r_max}
+
+    - _target_: tensorial.gcnn.NodewiseLinear
+      field: attributes
+      irreps_out: 8x0o + 8x0e + 8x1o + 8x1e + 8x2o + 8x2e
+
+    - _target_: tensorial.gcnn.NequipLayer
+      irreps_out: 8x0o + 8x0e + 8x1o + 8x1e + 8x2o + 8x2e
+      avg_num_neighbours: ${from_data.avg_num_neighbours}
+
+    - _target_: tensorial.gcnn.NequipLayer
+      irreps_out: 8x0o + 8x0e + 8x1o + 8x1e + 8x2o + 8x2e
+      avg_num_neighbours: ${from_data.avg_num_neighbours}
+
+    - _target_: tensorial.gcnn.NequipLayer
+      irreps_out: 8x0o + 8x0e + 8x1o + 8x1e + 8x2o + 8x2e
+      avg_num_neighbours: ${from_data.avg_num_neighbours}
+
+    # Keep only scalars and reduce the number passing this point
+    - _target_: tensorial.gcnn.NodewiseLinear
+      irreps_out: 4x0e + 4x0o + 4x1e + 4x1o + 4x2e + 4x2o + 2x3o + 2x3e
+
+      # Per-atom local magnetic field
+    - _target_: tensorial.gcnn.NodewiseLinear
+      irreps_out: 1x1o
+      out_field: B_ind_predicted
+
+    - _target_: e3response.magnetic.MagneticShieldingTensor
+      _partial_: True
