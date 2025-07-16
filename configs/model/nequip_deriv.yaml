@@ -1,6 +1,7 @@
 _target_: tensorial.ReaxModule
 
 jit: True
+donate_graph: False
 
 optimizer:
   _partial_: True
@@ -24,10 +25,10 @@ loss_fn:
 model:
   _target_: tensorial.nn.Sequential
   layers:
-    - _target_: tensorial.gcnn.atomic.SpeciesTransform
+    - _target_: tensorial.mlip.atomic.SpeciesTransform
       atomic_numbers: ${from_data.atomic_numbers}
 
-    - _target_: tensorial.gcnn.NodewiseEmbedding
+    - _target_: tensorial.mlip.NodewiseEmbedding
       attrs:
         species:
           _target_: tensorial.tensors.OneHot
@@ -37,44 +38,44 @@ model:
           irreps: 0e + 1o
           normalise: True
 
-    - _target_: tensorial.gcnn.EdgeVectors
+    - _target_: tensorial.mlip.EdgeVectors
 
-    - _target_: tensorial.gcnn.EdgewiseEncoding
+    - _target_: tensorial.mlip.EdgewiseEncoding
       attrs:
         edge_vectors:
           _target_: tensorial.tensors.SphericalHarmonic
           irreps: 0e + 1o
           normalise: True
 
-    - _target_: tensorial.gcnn.RadialBasisEdgeEncoding
+    - _target_: tensorial.mlip.RadialBasisEdgeEncoding
       r_max: ${r_max}
 
-    - _target_: tensorial.gcnn.NodewiseLinear
+    - _target_: tensorial.mlip.NodewiseLinear
       field: attributes
       irreps_out: 16x0o + 16x0e + 16x1o + 16x1e
 
-    - _target_: tensorial.gcnn.NequipLayer
+    - _target_: tensorial.mlip.NequipLayer
       irreps_out: 16x0o + 16x0e + 16x1o + 16x1e
       avg_num_neighbours: ${from_data.avg_num_neighbours}
 
-    - _target_: tensorial.gcnn.NequipLayer
+    - _target_: tensorial.mlip.NequipLayer
       irreps_out: 16x0o + 16x0e + 16x1o + 16x1e
       avg_num_neighbours: ${from_data.avg_num_neighbours}
 
-    - _target_: tensorial.gcnn.NequipLayer
+    - _target_: tensorial.mlip.NequipLayer
       irreps_out: 16x0o + 16x0e + 16x1o + 16x1e
       avg_num_neighbours: ${from_data.avg_num_neighbours}
 
     # Keep only scalars and reduce the number passing this point
-    - _target_: tensorial.gcnn.NodewiseLinear
+    - _target_: tensorial.mlip.NodewiseLinear
       irreps_out: 4x0e + 4x0o + 4x1e + 4x1o + 4x2e + 4x2o + 2x3o + 2x3e
 
-    - _target_: tensorial.gcnn.NodewiseLinear
+    - _target_: tensorial.mlip.NodewiseLinear
       irreps_out: 1x0e
       out_field: predicted_energy # Per-atom energy
 
     # Final total energy
-    - _target_: tensorial.gcnn.NodewiseReduce
+    - _target_: tensorial.mlip.NodewiseReduce
       field: predicted_energy
       out_field: predicted_energy  # Global energy
 

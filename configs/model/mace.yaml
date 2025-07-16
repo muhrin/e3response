@@ -11,14 +11,14 @@ scheduler:
   decay_steps: 100
 
 loss_fn:
-  _target_: tensorial.gcnn.WeightedLoss
+  _target_: tensorial.mlip.WeightedLoss
   weights: [ 1000., 1. ]
   loss_fns:
-    - _target_: tensorial.gcnn.Loss
+    - _target_: tensorial.mlip.Loss
       field: nodes.born_charges_predicted
       target_field: nodes.born_charges
 
-    - _target_: tensorial.gcnn.Loss
+    - _target_: tensorial.mlip.Loss
       field: nodes.raman_tensors_predicted
       target_field: nodes.raman_tensors
 
@@ -26,52 +26,52 @@ loss_fn:
 model:
   _target_: tensorial.nn.Sequential
   layers:
-    - _target_: tensorial.gcnn.atomic.SpeciesTransform
+    - _target_: tensorial.mlip.atomic.SpeciesTransform
       atomic_numbers: ${from_data.atomic_numbers}
 
-    - _target_: tensorial.gcnn.NodewiseEncoding
+    - _target_: tensorial.mlip.NodewiseEncoding
       attrs:
         species:
           _target_: tensorial.tensors.OneHot
           num_classes: ${from_data.n_elements}
 
-    - _target_: tensorial.gcnn.EdgeVectors
+    - _target_: tensorial.mlip.EdgeVectors
 
-    - _target_: tensorial.gcnn.EdgewiseEncoding
+    - _target_: tensorial.mlip.EdgewiseEncoding
       attrs:
         edge_vectors:
           _target_: tensorial.tensors.SphericalHarmonic
           irreps: 0e + 1o
           normalise: True
 
-    - _target_: tensorial.gcnn.RadialBasisEdgeEncoding
+    - _target_: tensorial.mlip.RadialBasisEdgeEncoding
       r_max: ${r_max}
 
-    - _target_: tensorial.gcnn.NodewiseLinear
+    - _target_: tensorial.mlip.NodewiseLinear
       field: attributes
       num_types: ${from_data.n_elements}
       irreps_out: 16x0o + 16x0e + 16x1o + 16x1e
 
-    - _target_: tensorial.gcnn._mace.Mace
+    - _target_: tensorial.mlip._mace.Mace
       irreps_out: 0e
       out_field: energy
       hidden_irreps: 128x0e + 128x1o
       num_types: ${from_data.n_elements}
       avg_num_neighbours: ${from_data.avg_num_neighbours}
 
-    - _target_: tensorial.gcnn.atomic.per_species_rescale
+    - _target_: tensorial.mlip.atomic.per_species_rescale
       num_types: ${from_data.n_elements}
       scales: ${from_data.force_scale}
       shifts: ${from_data.energy_shifts}
       field: nodes.energy  # Per-atom energy
 
     # Final total energy
-    - _target_: tensorial.gcnn.NodewiseReduce
+    - _target_: tensorial.mlip.NodewiseReduce
       field: energy
       out_field: predicted_energy  # Global energy
 
     # Take derivatives to get forces
-    - _target_: tensorial.gcnn.Grad
+    - _target_: tensorial.mlip.Grad
       _partial_: True
       of: globals.predicted_energy
       wrt: nodes.positions

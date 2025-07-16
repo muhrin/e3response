@@ -33,6 +33,8 @@ task_name: "train"
 tags: [ "dev" ]
 
 r_max: 5.0
+metrics:
+
 
 # Gather data use by the model before training
 from_data:
@@ -41,7 +43,7 @@ from_data:
   avg_num_neighbours: atomic/avg_num_neighbours
   force_scale: atomic/force_std
   energy_shifts:
-    _target_: tensorial.gcnn.atomic.EnergyContributionLstsq
+    _target_: tensorial.mlip.atomic.EnergyContributionLstsq
     type_map: ${from_data.atomic_numbers}
 
 # set False to skip model training

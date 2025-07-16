@@ -1,22 +1,12 @@
 _target_: tensorial.ReaxModule
 
-<<<<<<< Updated upstream
-optimizer:
-  _partial_: True
-  _target_: optax.adam
-  learning_rate: 0.001
-
-scheduler:
-  _target_: optax.schedules.cosine_decay_schedule
-  init_value: 0.1
-  decay_steps: 100
-=======
 metrics:
-    nmr_tensors_rmse:
-      _target_: tensorial.gcnn.graph_metric
-      metric: rmse
-      predictions: nodes.NMR_tensors_predicted
-      targets: nodes.NMR_tensors
+  nmr_tensors_rmse:
+    _target_: tensorial.mlip.graph_metric
+    metric: rmse
+    predictions: nodes.NMR_tensors_predicted
+    targets: nodes.NMR_tensors
+    mask: nodes.nmr_active
 
 # mul: 8
 # node_feature_irreps: ${mul}x0o + ${mul}x0e + ${mul}x1o + ${mul}x1e + ${mul}x2o + ${mul}x2e + ${mul}x3o + ${mul}x3e
@@ -31,99 +21,69 @@ optimizer:
   #     init_value: 0.05
   #     transition_steps: 500
   #     decay_rate: 0.9
->>>>>>> Stashed changes
 
 loss_fn:
-  _target_: tensorial.gcnn.WeightedLoss
-  weights: [ 1000., 1. ]
-  loss_fns:
-    - _target_: tensorial.gcnn.Loss
-      field: nodes.born_charges_predicted
-      target_field: nodes.born_charges
+  _target_: tensorial.mlip.Loss
+  field: nodes.NMR_tensors_predicted
+  target_field: nodes.NMR_tensors
+  mask_field: nodes.nmr_active
 
-    - _target_: tensorial.gcnn.Loss
-      field: nodes.raman_tensors_predicted
-      target_field: nodes.raman_tensors
+
 
 model:
   _target_: tensorial.nn.Sequential
   layers:
-    - _target_: tensorial.gcnn.atomic.SpeciesTransform
+    - _target_: tensorial.mlip.atomic.SpeciesTransform
       atomic_numbers: ${from_data.atomic_numbers}
 
-    - _target_: tensorial.gcnn.NodewiseEncoding
+    - _target_: tensorial.mlip.NodewiseEncoding
       attrs:
         species:
           _target_: tensorial.tensors.OneHot
           num_classes: ${from_data.n_elements}
-        external_electric_field:
-          _target_: tensorial.tensors.AsIrreps
-          irreps: 1x1e
 
-    - _target_: tensorial.gcnn.EdgeVectors
+    - _target_: tensorial.mlip.EdgeVectors
 
-    - _target_: tensorial.gcnn.EdgewiseEncoding
+    - _target_: tensorial.mlip.EdgewiseEncoding
       attrs:
         edge_vectors:
           _target_: tensorial.tensors.SphericalHarmonic
           irreps: 0e + 1o
           normalise: True
 
-    - _target_: tensorial.gcnn.RadialBasisEdgeEncoding
+    - _target_: tensorial.mlip.RadialBasisEdgeEncoding
       r_max: ${r_max}
 
-    - _target_: tensorial.gcnn.NodewiseLinear
+    - _target_: tensorial.mlip.NodewiseLinear
       field: attributes
-<<<<<<< Updated upstream
-      irreps_out: 16x0o + 16x0e + 16x1o + 16x1e
-
-    - _target_: tensorial.gcnn.NequipLayer
-      irreps_out: 16x0o + 16x0e + 16x1o + 16x1e
-      avg_num_neighbours: ${from_data.avg_num_neighbours}
-
-    - _target_: tensorial.gcnn.NequipLayer
-      irreps_out: 16x0o + 16x0e + 16x1o + 16x1e
-      avg_num_neighbours: ${from_data.avg_num_neighbours}
-
-    - _target_: tensorial.gcnn.NequipLayer
-      irreps_out: 16x0o + 16x0e + 16x1o + 16x1e
-=======
       irreps_out: 8x0o + 8x0e + 8x1o + 8x1e + 8x2o + 8x2e #+ 8x3o + 8x3e
 
-    - _target_: tensorial.gcnn.NequipLayer
+    - _target_: tensorial.mlip.NequipLayer
       irreps_out: 8x0o + 8x0e + 8x1o + 8x1e + 8x2o + 8x2e #+ 8x3o + 8x3e
       avg_num_neighbours: ${from_data.avg_num_neighbours}
 
-    - _target_: tensorial.gcnn.NequipLayer
+    - _target_: tensorial.mlip.NequipLayer
       irreps_out: 8x0o + 8x0e + 8x1o + 8x1e + 8x2o + 8x2e #+ 8x3o + 8x3e
       avg_num_neighbours: ${from_data.avg_num_neighbours}
 
-    - _target_: tensorial.gcnn.NequipLayer
+    - _target_: tensorial.mlip.NequipLayer
       irreps_out: 8x0o + 8x0e + 8x1o + 8x1e + 8x2o + 8x2e #+ 8x3o + 8x3e
->>>>>>> Stashed changes
       avg_num_neighbours: ${from_data.avg_num_neighbours}
 
     # Keep only scalars and reduce the number passing this point
-    - _target_: tensorial.gcnn.NodewiseLinear
+    - _target_: tensorial.mlip.NodewiseLinear
       irreps_out: 4x0e + 4x0o + 4x1e + 4x1o + 4x2e + 4x2o + 2x3o + 2x3e
 
-    - _target_: tensorial.gcnn.NodewiseLinear
-      irreps_out: 1x0e
-      out_field: energy # Per-atom energy
+    # Per atom Raman tensors
+    - _target_: tensorial.mlip.NodewiseLinear
+      irreps_out: 1x0e + 1x1e + 1x2e
+      out_field: NMR_tensors_predicted
 
-    # Final total energy
-    - _target_: tensorial.gcnn.NodewiseReduce
-      field: energy
-      out_field: predicted_energy  # Global energy
-
-<<<<<<< Updated upstream
-    # Per-atom induced magnetic field
-    - _target_: tensorial.gcnn.NodewiseLinear
-      irreps_out: 1x1o
-      out_field: predicted_induced_field
-=======
-    # - _target_: tensorial.gcnn.IndexedRescale
-    #   num_types: ${from_data.n_elements}
-    #   field: nodes.NMR_tensors_predicted
-    #   index_field: nodes.species
->>>>>>> Stashed changes
+    - _target_: tensorial.mlip.NodewiseDecoding
+      in_field: NMR_tensors_predicted
+      attrs:
+        NMR_tensors_predicted:
+          _target_: tensorial.CartesianTensor
+          formula: ij
+          i: 1o
+          j: 1o

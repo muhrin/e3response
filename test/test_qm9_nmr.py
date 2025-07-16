@@ -1,3 +1,4 @@
+from flax import nnx
 import numpy as np
 import pytest
 import reax
@@ -49,12 +50,7 @@ def test_qm9_nmr_dataloader_outputs_correct_graphs(dataset_name):
 
     class DummyStage(reax.Stage):
         def __init__(self):
-            super().__init__(
-                name="dummystage",
-                module=None,
-                strategy=None,
-                rng=reax.Generator(seed=42),
-            )
+            super().__init__(name="dummystage", module=None, strategy=None, rngs=nnx.Rngs(0))
 
         def _step(self, batch, state):
             return {}

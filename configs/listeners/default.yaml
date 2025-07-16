@@ -15,7 +15,7 @@ model_checkpoint:
   auto_insert_metric_name: False
 
 early_stopping:
-  monitor: "val/nmr_tensors_rmse"
+  monitor: "val/loss"
   min_delta: 0.
   patience: 20
   check_on_train_epoch_end: True

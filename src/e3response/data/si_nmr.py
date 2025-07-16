@@ -1,3 +1,4 @@
+import functools
 import logging
 import pathlib
 import pickle
@@ -52,22 +53,23 @@ class SiNmrDataModule(reax.DataModule):
         structures = self._load_structures()
 
         train, val, test = reax.data.random_split(
-            stage.rng, dataset=structures, lengths=self._train_val_test_split
+            stage.rngs, dataset=structures, lengths=self._train_val_test_split
         )
 
         to_graph: Callable[[Atoms], jraph.GraphsTuple] = lambda atoms: gcnn.atomic.graph_from_ase(
             atoms,
             r_max=self._rmax,
-            atom_include_keys=("numbers", "NMR_tensors", "mask"),
+            atom_include_keys=("numbers", "NMR", "mask"),
             global_include_keys=[],
+            key_mapping={"NMR": "NMR_tensors", "mask": "nmr_active"},
         )
 
         train_graphs = list(map(to_graph, train))
         val_graphs = list(map(to_graph, val))
         test_graphs = list(map(to_graph, test))
 
-        calc_padding = lambda graphs: gcnn.data.GraphBatcher.calculate_padding(
-            graphs, batch_size=self._batch_size, with_shuffle=True
+        calc_padding = functools.partial(
+            gcnn.data.GraphBatcher.calculate_padding, batch_size=self._batch_size, with_shuffle=True
         )
 
         self._max_padding = gcnn.data.max_padding(

@@ -1,3 +1,4 @@
+from collections.abc import Callable
 import math
 
 from flax import linen
@@ -47,7 +48,7 @@ class Polarization(linen.Module):
 
     Parameters
     ----------
-    energy_fn : gcnn.GraphFunction
+    energy_fn : mlip.GraphFunction
         A function that computes the total energy of the system from a graph input.
     energy_key : str, optional
         The field name under which the total energy is stored in the graph's globals.
@@ -74,7 +75,9 @@ class Polarization(linen.Module):
     def setup(self) -> None:
         # pylint: disable=attribute-defined-outside-init
         # Define the gradient of the energy wrt electric field function
-        self._calc = gcnn.experimental.diff(
+        self._diff_fn: Callable[
+            [jraph.GraphsTuple, tt.ArrayType], tuple[tt.ArrayType, jraph.GraphsTuple]
+        ] = gcnn.experimental.diff(
             self.energy_fn,
             f"globals.{self.energy_key}:gk",
             wrt=[f"globals.{self.electric_field_key}:gα"],
@@ -84,9 +87,10 @@ class Polarization(linen.Module):
         )
 
     def __call__(self, graph: jraph.GraphsTuple) -> jraph.GraphsTuple:
-        polarization, graph = self._diff_fn(
-            graph, jnp.zeros_like(graph.globals[keys.EXTERNAL_ELECTRIC_FIELD])
-        )
+        diff_at = {
+            f"globals.{self.electric_field_key}": graph.globals[keys.EXTERNAL_ELECTRIC_FIELD]
+        }
+        polarization, graph = self._diff_fn(graph, **diff_at)
         polarization: PolarizationArray = polarization
 
         if gcnn.keys.CELL in graph.globals:
@@ -130,7 +134,7 @@ class DielectricTensor(linen.Module):
 
     Parameters
     ----------
-    energy_fn : gcnn.GraphFunction
+    energy_fn : mlip.GraphFunction
         A function that computes the total energy of a system from a graph representation.
     energy_key : str, optional
         The key used to retrieve the total energy from the graph. Default is `atomic.TOTAL_ENERGY`.
@@ -165,7 +169,9 @@ class DielectricTensor(linen.Module):
 
     def setup(self) -> None:
         # pylint: disable=attribute-defined-outside-init
-        self._calc = gcnn.experimental.diff(
+        self._calc: Callable[
+            [jraph.GraphsTuple, tt.ArrayType], tuple[tt.ArrayType, jraph.GraphsTuple]
+        ] = gcnn.experimental.diff(
             self.energy_fn,
             f"globals.{self.energy_key}:gk",
             wrt=[f"globals.{self.electric_field_key}:gα", f"globals.{self.electric_field_key}:gβ"],
@@ -175,7 +181,9 @@ class DielectricTensor(linen.Module):
 
     def __call__(self, graph: jraph.GraphsTuple) -> jraph.GraphsTuple:
         # Evaluate the e-field derivative of the polarizability at zero electric field
-        derivative, graph = self._calc(graph, graph.globals[self.electric_field_key])
+        derivative, graph = self._calc(
+            graph, **{f"globals.{self.electric_field_key}": graph.globals[self.electric_field_key]}
+        )
         dielectric: DielectricTensorArray = -derivative / self.epsilon_0
 
         if gcnn.keys.CELL in graph.globals:
@@ -217,7 +225,7 @@ class BornCharges(linen.Module):
 
     Parameters
     ----------
-    energy_fn : gcnn.GraphFunction
+    energy_fn : mlip.GraphFunction
         A function that computes the total energy of the system from a graph input.
     energy_key : str, optional
         The field name under which the total energy is stored in the graph's globals.
@@ -240,7 +248,9 @@ class BornCharges(linen.Module):
     def setup(self) -> None:
         # pylint: disable=attribute-defined-outside-init
         # Define the derivative of the energy
-        self._diff_fn = gcnn.experimental.diff(
+        self._diff_fn: Callable[
+            [jraph.GraphsTuple, tt.ArrayType, tt.ArrayType], tuple[tt.ArrayType, jraph.GraphsTuple]
+        ] = gcnn.experimental.diff(
             self.energy_fn,
             f"globals.{self.energy_key}:gk",
             wrt=[f"globals.{self.electric_field_key}:gα", f"nodes.{keys.POSITIONS}:Iγ"],
@@ -249,11 +259,11 @@ class BornCharges(linen.Module):
         )
 
     def __call__(self, graph: jraph.GraphsTuple) -> jraph.GraphsTuple:
-        derivative, graph = self._diff_fn(
-            graph,
-            graph.globals[keys.EXTERNAL_ELECTRIC_FIELD],
-            graph.nodes[gcnn.keys.POSITIONS],
-        )
+        diff_at = {
+            f"globals.{self.electric_field_key}": graph.globals[keys.EXTERNAL_ELECTRIC_FIELD],
+            f"nodes.{keys.POSITIONS}": graph.nodes[gcnn.keys.POSITIONS],
+        }
+        derivative, graph = self._diff_fn(graph, **diff_at)
         bec: BornEffectiveChargesArray = -derivative
 
         return (
@@ -284,7 +294,7 @@ class RamanTensors(linen.Module):
 
     Parameters
     ----------
-    energy_fn : gcnn.GraphFunction
+    energy_fn : mlip.GraphFunction
         A function that computes the total energy of the system from a graph input.
     energy_key : str, optional
         The field name under which the total energy is stored in the graph's globals.
@@ -307,7 +317,9 @@ class RamanTensors(linen.Module):
     def setup(self) -> None:
         # pylint: disable=attribute-defined-outside-init
         # Define the derivative of the energy
-        self._diff_fn = gcnn.experimental.diff(
+        self._diff_fn: Callable[
+            [jraph.GraphsTuple, tt.ArrayType, tt.ArrayType], tuple[tt.ArrayType, jraph.GraphsTuple]
+        ] = gcnn.experimental.diff(
             self.energy_fn,
             f"globals.{self.energy_key}:gk",
             wrt=[
@@ -320,11 +332,11 @@ class RamanTensors(linen.Module):
         )
 
     def __call__(self, graph: jraph.GraphsTuple) -> jraph.GraphsTuple:
-        derivative, graph = self._diff_fn(
-            graph,
-            graph.globals[keys.EXTERNAL_ELECTRIC_FIELD],
-            graph.nodes[gcnn.keys.POSITIONS],
-        )
+        diff_at = {
+            f"globals.{self.electric_field_key}": graph.globals[keys.EXTERNAL_ELECTRIC_FIELD],
+            f"nodes.{keys.POSITIONS}": graph.nodes[gcnn.keys.POSITIONS],
+        }
+        derivative, graph = self._diff_fn(graph, **diff_at)
         raman: RamanTensorsArray = -derivative
 
         return (

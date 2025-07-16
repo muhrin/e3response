@@ -1,5 +1,5 @@
 tensor_parity_plots:
-  _target_: reax.listeners.TensorParityPlots
+  _target_: e3response.listeners.TensorParityPlots
 
   # Optional: override which scalar keys to extract/compare
   scalar_keys:

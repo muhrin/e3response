@@ -93,7 +93,7 @@ class BtoDataModule(reax.DataModule):
 
                 # Split up the graphs into sets
                 train, val, test = reax.data.random_split(
-                    stage.rng, dataset=structures, lengths=self._train_val_test_split
+                    stage.rngs, dataset=structures, lengths=self._train_val_test_split
                 )
                 all_train.extend(train)
                 all_val.extend(val)

@@ -22,7 +22,7 @@ def test_load_train(model):
         from_data = tensorial.config.FromData(
             cfg["from_data"],
             trainer.strategy,
-            trainer.rng,
+            trainer.rngs,
             datamodule=datamodule,
         )
         trainer._run_stage(from_data)

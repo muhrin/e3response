@@ -55,20 +55,22 @@ class CshNmrDataModule(reax.DataModule):
             stage.rng, dataset=structures, lengths=self._train_val_test_split
         )
 
-        to_graph: Callable[[Atoms], jraph.GraphsTuple] = lambda atoms: gcnn.atomic.graph_from_ase(
-            atoms,
-            r_max=self._rmax,
-            atom_include_keys=("numbers", "NMR_tensors", "mask"),
-            global_include_keys=[],
-        )
+        def to_graph(atoms):
+            return gcnn.atomic.graph_from_ase(
+                atoms,
+                r_max=self._rmax,
+                atom_include_keys=("numbers", "NMR_tensors", "mask"),
+                global_include_keys=[],
+            )
 
         train_graphs = list(map(to_graph, train))
         val_graphs = list(map(to_graph, val))
         test_graphs = list(map(to_graph, test))
 
-        calc_padding = lambda graphs: gcnn.data.GraphBatcher.calculate_padding(
-            graphs, batch_size=self._batch_size, with_shuffle=True
-        )
+        def calc_padding(graphs):
+            return gcnn.data.GraphBatcher.calculate_padding(
+                graphs, batch_size=self._batch_size, with_shuffle=True
+            )
 
         self._max_padding = gcnn.data.max_padding(
             *map(calc_padding, (train_graphs, val_graphs, test_graphs))

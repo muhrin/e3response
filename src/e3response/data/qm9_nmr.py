@@ -397,7 +397,7 @@ class QM9NmrDataModule(reax.DataModule):
 
             # Split up the graphs into sets
             train, val, test = reax.data.random_split(
-                stage.rng, dataset=self.dataset, lengths=self._train_val_test_split
+                stage.rngs, dataset=self.dataset, lengths=self._train_val_test_split
             )
 
             calc_padding = functools.partial(

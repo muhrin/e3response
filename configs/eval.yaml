@@ -14,6 +14,9 @@ task_name: "eval"
 
 tags: ["dev"]
 
+# passing model path is necessary for evaluation
+config_path: ???
+
 # passing checkpoint path is necessary for evaluation
 ckpt_path: ???
 
