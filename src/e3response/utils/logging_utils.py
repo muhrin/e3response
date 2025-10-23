@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any
 
 import jax
 from lightning_utilities.core.rank_zero import rank_zero_only
@@ -12,7 +12,7 @@ log = pylogger.RankedLogger(__name__, rank_zero_only=True)
 
 
 @rank_zero_only
-def log_hyperparameters(object_dict: Dict[str, Any]) -> None:
+def log_hyperparameters(object_dict: dict[str, Any]) -> None:
     """Controls which config parts are saved by Lightning loggers.
 
     Additionally, it saves:

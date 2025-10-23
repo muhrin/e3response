@@ -1,9 +1,10 @@
+from collections.abc import Callable, Iterable, Sequence
 import functools
 import logging
 import pathlib
 import re
 import tarfile
-from typing import Any, Callable, Final, Iterable, Optional, Sequence, Union
+from typing import Any, Final
 
 import ase
 import ase.io
@@ -33,13 +34,13 @@ class BtoDataModule(reax.DataModule):
     def __init__(
         self,
         r_max: float,
-        data_dir: Union[str, pathlib.Path] = "data/bto/",
+        data_dir: str | pathlib.Path = "data/bto/",
         archives: Sequence[str] = (
             "BTO_Pm-3m_5atoms_400K_3x3x3_ensemble.tar.gz",
             "BTO_Pm-3m_5atoms_800K_3x3x3.tar.gz",
         ),
         tensors: tuple[str] = ("raman_tensors", "born_charges", "dielectric"),
-        train_val_test_split: Sequence[Union[int, float]] = (0.8, 0.1, 0.1),
+        train_val_test_split: Sequence[int | float] = (0.8, 0.1, 0.1),
         batch_size: int = 64,
     ) -> None:
         """Initialize a `SiliconDataModule`.
@@ -55,14 +56,14 @@ class BtoDataModule(reax.DataModule):
         self._data_dir: Final[str] = str(data_dir)
         self._archives: Final[tuple[str, ...]] = tuple(archives)
         self._tensors = tensors
-        self._train_val_test_split: Final[Sequence[Union[int, float]]] = train_val_test_split
+        self._train_val_test_split: Final[Sequence[int | float]] = train_val_test_split
         self._batch_size: Final[int] = batch_size
 
         # State
         self.batch_size_per_device = batch_size
-        self.data_train: Optional[reax.data.Dataset] = None
-        self.data_val: Optional[reax.data.Dataset] = None
-        self.data_test: Optional[reax.data.Dataset] = None
+        self.data_train: reax.data.Dataset | None = None
+        self.data_val: reax.data.Dataset | None = None
+        self.data_test: reax.data.Dataset | None = None
 
     @override
     def setup(self, stage: "reax.Stage", /) -> None:
@@ -235,7 +236,7 @@ def get_structures(root_dir: pathlib.Path, tensors: Iterable[str]) -> list[ase.A
 
 
 def read_scf(filename) -> ase.Atoms:
-    with open(filename, "r", encoding="utf-8") as fileobj:
+    with open(filename, encoding="utf-8") as fileobj:
         _data, card_lines = espresso.read_fortran_namelist(fileobj)
 
     cell, _ = espresso.get_cell_parameters(card_lines)

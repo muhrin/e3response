@@ -32,7 +32,7 @@ dependencies = [
     'orbax-checkpoint',
     'e3nn-jax',
     "equinox",
-    "reax>=0.2.0",
+    "reax>=0.2,<0.6",
     "tensorial>=0.4.2",
     "pymatgen",
 ]

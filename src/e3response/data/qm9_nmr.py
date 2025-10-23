@@ -1,4 +1,5 @@
 import collections
+from collections.abc import Callable, Sequence
 import functools
 from functools import lru_cache
 import logging
@@ -6,7 +7,7 @@ import os
 import pathlib
 import re
 import tempfile
-from typing import Any, Callable, Final, Optional, Sequence, Union
+from typing import Any, Final
 import urllib.error
 import urllib.request
 import zipfile
@@ -14,8 +15,8 @@ import zipfile
 import ase
 import jraph
 import numpy as np
-from pymatgen.io import gaussian  # type: ignore
-import pymatgen.io.ase  # type: ignore
+from pymatgen.io import gaussian
+import pymatgen.io.ase
 import reax
 from tensorial import gcnn
 import tqdm
@@ -58,9 +59,9 @@ class Qm9NmrDataset(collections.abc.Sequence[jraph.GraphsTuple]):
         self,
         r_max: float = 5,
         data_dir: str = "data/qm9_nmr/",
-        dataset: Union[str, Sequence[str]] = "gasphase",
-        atom_keys: Optional[Union[str, Sequence[str]]] = None,
-        limit: Optional[int] = None,
+        dataset: str | Sequence[str] = "gasphase",
+        atom_keys: str | Sequence[str] | None = None,
+        limit: int | None = None,
     ) -> None:
         """
         Initialize the QM9-NMR dataset.
@@ -131,7 +132,7 @@ class Qm9NmrDataset(collections.abc.Sequence[jraph.GraphsTuple]):
                 try:
                     with zipfile.ZipFile(archive_path, "r") as zip_ref:
                         zip_ref.testzip()
-                except (zipfile.BadZipFile, zipfile.LargeZipFile, IOError) as e:
+                except (zipfile.BadZipFile, zipfile.LargeZipFile, OSError) as e:
                     _LOGGER.warning(
                         "%s is corrupted or unreadable: %s, removing corrupted archive ...",
                         archive_name,
@@ -189,7 +190,7 @@ class Qm9NmrDataset(collections.abc.Sequence[jraph.GraphsTuple]):
         except OSError as e:
             _LOGGER.error("Filesystem error while writing %s: %s", path, e)
 
-    def _extract_archive_zip(self, zip_path: str, limit: Optional[int] = None) -> list:
+    def _extract_archive_zip(self, zip_path: str, limit: int | None = None) -> list:
 
         structures = []
 
@@ -229,7 +230,7 @@ def _create_molecule_data(log_file):
         structure = gaussian_output.final_structure
 
         # extraction of data from .log file
-        with open(log_file, "r", encoding="utf-8") as file:
+        with open(log_file, encoding="utf-8") as file:
             log_data = file.read()
 
         shielding_pattern = (
@@ -294,12 +295,12 @@ def _create_molecule_data(log_file):
         _LOGGER.error("Error in file %s: %s", log_file, e)
         raise
 
-    except (IOError, OSError) as e:
+    except OSError as e:
         _LOGGER.error("File system error while processing %s: %s", log_file, e)
         raise
 
 
-def get_structure_and_data_from_log(log_path: pathlib.Path) -> Optional[ase.Atoms]:
+def get_structure_and_data_from_log(log_path: pathlib.Path) -> ase.Atoms | None:
     # _LOGGER.info("Parsing Gaussian .log file: %s", log_path)
 
     try:
@@ -333,7 +334,7 @@ def get_structure_and_data_from_log(log_path: pathlib.Path) -> Optional[ase.Atom
 
         return atoms
 
-    except (ValueError, IOError) as e:
+    except (ValueError, OSError) as e:
         _LOGGER.error("Parsing error for %s: %s", log_path, e)
     return None
 
@@ -350,10 +351,10 @@ class Qm9NmrDataModule(reax.DataModule):
         self,
         r_max: float = 5,
         data_dir: str = "data/qm9_nmr/",
-        dataset: Union[str, Sequence[str]] = "gasphase",
-        atom_keys: Optional[Sequence[str]] = None,
-        limit: Optional[int] = None,
-        train_val_test_split: Sequence[Union[int, float]] = (0.85, 0.05, 0.1),
+        dataset: str | Sequence[str] = "gasphase",
+        atom_keys: Sequence[str] | None = None,
+        limit: int | None = None,
+        train_val_test_split: Sequence[int | float] = (0.85, 0.05, 0.1),
         batch_size: int = 64,
     ) -> None:
         """Initialize a QM9-NMR data module.
@@ -371,19 +372,19 @@ class Qm9NmrDataModule(reax.DataModule):
 
         # Params
         self._data_dir: Final[str] = data_dir
-        self._dataset: Union[str, Sequence[str]] = dataset
-        self.dataset: Optional[Qm9NmrDataset] = None
+        self._dataset: str | Sequence[str] = dataset
+        self.dataset: Qm9NmrDataset | None = None
         self._rmax = r_max
         self._atom_keys = atom_keys
         self._limit = limit
-        self._train_val_test_split: Final[Sequence[Union[int, float]]] = train_val_test_split
+        self._train_val_test_split: Final[Sequence[int | float]] = train_val_test_split
         self._batch_size: Final[int] = batch_size
 
         # State
         self.batch_size_per_device = batch_size
-        self.data_train: Optional[reax.data.Dataset] = None
-        self.data_val: Optional[reax.data.Dataset] = None
-        self.data_test: Optional[reax.data.Dataset] = None
+        self.data_train: reax.data.Dataset | None = None
+        self.data_val: reax.data.Dataset | None = None
+        self.data_test: reax.data.Dataset | None = None
 
     @override
     def setup(self, stage: "reax.Stage", /) -> None:
