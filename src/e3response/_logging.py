@@ -2,7 +2,7 @@ import logging
 import os
 import shutil
 import tempfile
-from typing import TYPE_CHECKING, Union
+from typing import TYPE_CHECKING
 
 from typing_extensions import override
 
@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 
 class MlflowHandler(logging.Handler):
     def __init__(
-        self, client: "mlflow.tracking.MlflowClient", run_id: str, level: Union[int, str] = 0
+        self, client: "mlflow.tracking.MlflowClient", run_id: str, level: int | str = 0
     ) -> None:
         super().__init__(level)
         self._tempfile = None
