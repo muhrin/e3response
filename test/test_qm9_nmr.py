@@ -10,7 +10,7 @@ mock_dir = Path(__file__).parent / "mock_datasets" / "qm9_nmr"
 
 
 @pytest.mark.parametrize("dataset_name", list(DATASET_URLS.keys()))
-def test_qm9mrdataset_and_qm9nmrdatamodule(dataset_name):
+def test_qm9_nmr_dataset(dataset_name, test_engine):
     dataset = Qm9NmrDataset(
         dataset=dataset_name,
         atom_keys=["species", "anisotropy"],
@@ -40,6 +40,9 @@ def test_qm9mrdataset_and_qm9nmrdatamodule(dataset_name):
             graph.nodes["mu"], np.ndarray
         ), f"'mu' in graph {i} is not a numpy array for dataset {dataset_name}"
 
+
+@pytest.mark.parametrize("dataset_name", list(DATASET_URLS.keys()))
+def test_qm9_nmr_datamodule(dataset_name, test_engine):
     dm = Qm9NmrDataModule(
         dataset=dataset_name, train_val_test_split=(0.6, 0.2, 0.2), batch_size=1, data_dir=mock_dir
     )
@@ -49,8 +52,8 @@ def test_qm9mrdataset_and_qm9nmrdatamodule(dataset_name):
             super().__init__(
                 name="dummystage",
                 module=None,
-                strategy=None,
-                rng=reax.Generator(seed=42),
+                engine=test_engine,
+                rngs=test_engine.rngs,
             )
 
         def _step(self):

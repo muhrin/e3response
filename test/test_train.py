@@ -4,6 +4,7 @@ import hydra
 import pytest
 import reax
 import tensorial
+from tensorial import reaxkit as rkit
 
 import e3response
 import e3response.data
@@ -19,10 +20,10 @@ def test_load_train(model):
     with hydra.initialize_config_dir(version_base=None, config_dir=str(CONFIG_PATH)):
         cfg = hydra.compose(config_name="train", overrides=[f"model={model}", "data=bto"])
         datamodule = e3response.data.BtoDataModule(r_max=5.0, data_dir=DATA_PATH / "bto")
-        from_data = tensorial.config.FromData(
+        from_data = rkit.FromData(
             cfg["from_data"],
-            trainer.strategy,
-            trainer.rng,
+            engine=trainer.engine,
+            rngs=trainer.rngs,
             datamodule=datamodule,
         )
         trainer._run_stage(from_data)

@@ -4,7 +4,7 @@ import logging
 import pathlib
 import re
 import tarfile
-from typing import Any, Final
+from typing import Final
 
 import ase
 import ase.io
@@ -94,7 +94,7 @@ class BtoDataModule(reax.DataModule):
 
                 # Split up the graphs into sets
                 train, val, test = reax.data.random_split(
-                    stage.rng, dataset=structures, lengths=self._train_val_test_split
+                    stage.rngs, dataset=structures, lengths=self._train_val_test_split
                 )
                 all_train.extend(train)
                 all_val.extend(val)
@@ -140,7 +140,7 @@ class BtoDataModule(reax.DataModule):
             self.data_test = test_graphs
 
     @override
-    def train_dataloader(self) -> reax.DataLoader[Any]:
+    def train_dataloader(self) -> reax.DataLoader:
         """Create and return the train dataloader.
 
         :return: The train dataloader.
@@ -158,7 +158,7 @@ class BtoDataModule(reax.DataModule):
         )
 
     @override
-    def val_dataloader(self) -> reax.DataLoader[Any]:
+    def val_dataloader(self) -> reax.DataLoader:
         """Create and return the validation dataloader.
 
         :return: The validation dataloader.
@@ -177,7 +177,7 @@ class BtoDataModule(reax.DataModule):
         )
 
     @override
-    def test_dataloader(self) -> reax.DataLoader[Any]:
+    def test_dataloader(self) -> reax.DataLoader:
         """Create and return the test dataloader.
 
         :return: The test dataloader.

@@ -6,8 +6,9 @@ import sys
 from typing import Final, cast
 
 import hydra
+from tensorial import reaxkit as rkit
 
-from . import config, eval, train  # pylint: disable=redefined-builtin
+from . import config
 
 COMMAND: Final[str] = "command"
 TRAIN: Final[str] = "train"
@@ -48,12 +49,12 @@ def main_cli():
         # Set the command line arguments to what remains so hydra can deal with it
         sys.argv = sys.argv[0:1] + _rest
 
-        script_path = args.input
+        script_path: pathlib.Path = args.input
         hydra_fn = hydra.main(
             version_base="1.3",
             config_path=str(script_path.parent.absolute()),
             config_name=script_path.stem,
-        )(train.main)
+        )(rkit.train.main)
     elif args.command == PREDICT:
         # Set the command line arguments to what remains so hydra can deal with it
         sys.argv = sys.argv[0:1] + _rest
@@ -69,7 +70,7 @@ def main_cli():
             version_base="1.3",
             config_path=str(script_path.parent.absolute()),
             config_name=script_path.stem,
-        )(eval.main)
+        )(rkit.evaluate.main)
     else:
         raise ValueError(f"Unknown command: {args.command}")
 

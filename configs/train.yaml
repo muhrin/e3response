@@ -7,7 +7,7 @@ defaults:
   - data: bto
   - model: nequip
   - listeners: default
-  - logger: csv # set logger here or use command line (e.g. `python train.py logger=tensorboard`)
+  - logger: csv # set logger here or use command line (e.g. `e3response train logger=tensorboard`)
   - trainer: default
   - paths: default
   - extras: default
@@ -21,7 +21,7 @@ defaults:
   # it's optional since it doesn't need to exist and is excluded from version control
   - optional local: default
 
-  # debugging config (enable through command line, e.g. `python train.py debug=default)
+  # debugging config (enable through command line, e.g. `e3response train debug=default)
   - debug: null
 
 # task name, determines output directory path
@@ -29,7 +29,7 @@ task_name: "train"
 
 # tags to help you identify your experiments
 # you can overwrite this in experiment configs
-# overwrite from command line with `python train.py tags="[first_tag, second_tag]"`
+# overwrite from command line with `e3response train tags="[first_tag, second_tag]"`
 tags: [ "dev" ]
 
 r_max: 5.0

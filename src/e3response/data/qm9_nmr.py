@@ -7,7 +7,7 @@ import os
 import pathlib
 import re
 import tempfile
-from typing import Any, Final
+from typing import Final
 import urllib.error
 import urllib.request
 import zipfile
@@ -58,7 +58,7 @@ class Qm9NmrDataset(collections.abc.Sequence[jraph.GraphsTuple]):
     def __init__(
         self,
         r_max: float = 5,
-        data_dir: str = "data/qm9_nmr/",
+        data_dir: str | pathlib.Path = "data/qm9_nmr/",
         dataset: str | Sequence[str] = "gasphase",
         atom_keys: str | Sequence[str] | None = None,
         limit: int | None = None,
@@ -350,7 +350,7 @@ class Qm9NmrDataModule(reax.DataModule):
     def __init__(
         self,
         r_max: float = 5,
-        data_dir: str = "data/qm9_nmr/",
+        data_dir: str | pathlib.Path = "data/qm9_nmr/",
         dataset: str | Sequence[str] = "gasphase",
         atom_keys: Sequence[str] | None = None,
         limit: int | None = None,
@@ -371,7 +371,7 @@ class Qm9NmrDataModule(reax.DataModule):
         super().__init__()
 
         # Params
-        self._data_dir: Final[str] = data_dir
+        self._data_dir: Final[pathlib.Path] = pathlib.Path(data_dir)
         self._dataset: str | Sequence[str] = dataset
         self.dataset: Qm9NmrDataset | None = None
         self._rmax = r_max
@@ -414,7 +414,7 @@ class Qm9NmrDataModule(reax.DataModule):
 
             # Split up the graphs into sets
             train, val, test = reax.data.random_split(
-                stage.rng, dataset=self.dataset, lengths=self._train_val_test_split
+                stage.rngs, dataset=self.dataset, lengths=self._train_val_test_split
             )
 
             calc_padding = functools.partial(
@@ -432,7 +432,7 @@ class Qm9NmrDataModule(reax.DataModule):
             self.data_test = test
 
     @override
-    def train_dataloader(self) -> reax.DataLoader[Any]:
+    def train_dataloader(self) -> reax.DataLoader:
         """Create and return the train dataloader.
 
         :return: The train dataloader.
@@ -450,7 +450,7 @@ class Qm9NmrDataModule(reax.DataModule):
         )
 
     @override
-    def val_dataloader(self) -> reax.DataLoader[Any]:
+    def val_dataloader(self) -> reax.DataLoader:
         """Create and return the validation dataloader.
 
         :return: The validation dataloader.
@@ -469,7 +469,7 @@ class Qm9NmrDataModule(reax.DataModule):
         )
 
     @override
-    def test_dataloader(self) -> reax.DataLoader[Any]:
+    def test_dataloader(self) -> reax.DataLoader:
         """Create and return the test dataloader.
 
         :return: The test dataloader.
