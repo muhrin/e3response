@@ -103,7 +103,7 @@ class Polarization(linen.Module):
 
 
 class DielectricTensor(linen.Module):
-    """
+    """'
     Returns a function that computes the (relative) dielectric tensor from the second
     derivative of the total energy with respect to the applied external electric field.
 
