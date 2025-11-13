@@ -6,7 +6,7 @@ build-backend = 'flit_core.buildapi'
 name = 'e3response'
 dynamic = ["version", "description"]
 authors = [
-    { name = 'Martin Uhrin', email = 'martin.uhrin.10@ucl.ac.uk' },
+    { name = 'Martin Uhrin', email = 'martin@digitalbaker.net' },
 ]
 readme = 'README.rst'
 license = { file = 'LICENSE.txt' }
@@ -150,12 +150,12 @@ split_arguments_when_comma_terminated = true
 [tool.tox]
 legacy_tox_ini = """
 [tox]
-envlist = py311
+envlist = py313
 
 [testenv]
 usedevelop = true
 
-[testenv:py{39,310,311,312}]
+[testenv:py{310,311,312,313}]
 description = Run the unit tests
 extras =
     dev
