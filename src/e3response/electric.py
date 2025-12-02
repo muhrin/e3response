@@ -74,10 +74,11 @@ class Polarization(linen.Module):
     def setup(self) -> None:
         # pylint: disable=attribute-defined-outside-init
         # Define the gradient of the energy wrt electric field function
-        self._calc = gcnn.experimental.diff(
+        self._calc = gcnn.diff(
             self.energy_fn,
             f"globals.{self.energy_key}:gk",
-            wrt=[f"globals.{self.electric_field_key}:gα"],
+            wrt=[f"globals.{self.electric_field_key}:α"],
+            at={f"globals.{self.electric_field_key}": jnp.zeros(3)},
             out=":gα",
             return_graph=True,
         )
@@ -164,17 +165,18 @@ class DielectricTensor(linen.Module):
 
     def setup(self) -> None:
         # pylint: disable=attribute-defined-outside-init
-        self._calc = gcnn.experimental.diff(
+        self._calc = gcnn.diff(
             self.energy_fn,
             f"globals.{self.energy_key}:gk",
-            wrt=[f"globals.{self.electric_field_key}:gα", f"globals.{self.electric_field_key}:gβ"],
+            wrt=[f"globals.{self.electric_field_key}:α", f"globals.{self.electric_field_key}:β"],
+            at={f"globals.{self.electric_field_key}": jnp.zeros(3)},
             out=":gαβ",
             return_graph=True,
         )
 
     def __call__(self, graph: jraph.GraphsTuple) -> jraph.GraphsTuple:
         # Evaluate the e-field derivative of the polarizability at zero electric field
-        derivative, graph = self._calc(graph, graph.globals[self.electric_field_key])
+        derivative, graph = self._calc(graph)
         dielectric: DielectricTensorArray = -derivative / self.epsilon_0
 
         if gcnn.keys.CELL in graph.globals:
@@ -240,19 +242,18 @@ class BornCharges(linen.Module):
     def setup(self) -> None:
         # pylint: disable=attribute-defined-outside-init
         # Define the derivative of the energy
-        self._diff_fn = gcnn.experimental.diff(
+        self._diff_fn = gcnn.diff(
             self.energy_fn,
             f"globals.{self.energy_key}:gk",
-            wrt=[f"globals.{self.electric_field_key}:gα", f"nodes.{keys.POSITIONS}:Iγ"],
+            wrt=[f"globals.{self.electric_field_key}:α", f"nodes.{keys.POSITIONS}:Iγ"],
+            at={f"globals.{self.electric_field_key}": jnp.zeros(3)},
             out=":Iαγ",
             return_graph=True,
         )
 
     def __call__(self, graph: jraph.GraphsTuple) -> jraph.GraphsTuple:
         derivative, graph = self._diff_fn(
-            graph,
-            graph.globals[keys.EXTERNAL_ELECTRIC_FIELD],
-            graph.nodes[gcnn.keys.POSITIONS],
+            graph, **{f"nodes.{keys.POSITIONS}": graph.nodes[gcnn.keys.POSITIONS]}
         )
         bec: BornEffectiveChargesArray = -derivative
 
@@ -304,23 +305,22 @@ class RamanTensors(linen.Module):
     def setup(self) -> None:
         # pylint: disable=attribute-defined-outside-init
         # Define the derivative of the energy
-        self._diff_fn = gcnn.experimental.diff(
+        self._diff_fn = gcnn.diff(
             self.energy_fn,
             f"globals.{self.energy_key}:gk",
             wrt=[
-                f"globals.{self.electric_field_key}:gα",
-                f"globals.{self.electric_field_key}:gβ",
+                f"globals.{self.electric_field_key}:α",
+                f"globals.{self.electric_field_key}:β",
                 f"nodes.{keys.POSITIONS}:Iγ",
             ],
+            at={f"globals.{self.electric_field_key}": jnp.zeros(3)},
             out=":Iγαβ",
             return_graph=True,
         )
 
     def __call__(self, graph: jraph.GraphsTuple) -> jraph.GraphsTuple:
         derivative, graph = self._diff_fn(
-            graph,
-            graph.globals[keys.EXTERNAL_ELECTRIC_FIELD],
-            graph.nodes[gcnn.keys.POSITIONS],
+            graph, **{f"nodes.{keys.POSITIONS}": graph.nodes[gcnn.keys.POSITIONS]}
         )
         raman: RamanTensorsArray = -derivative
 

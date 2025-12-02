@@ -33,7 +33,7 @@ dependencies = [
     'e3nn-jax',
     "equinox",
     "reax>=0.2,<0.7",
-    "tensorial>=0.4.2",
+    "tensorial>=0.5.1",
     "pymatgen",
 ]
 

@@ -43,7 +43,7 @@ class BtoDataModule(reax.DataModule):
         train_val_test_split: Sequence[int | float] = (0.8, 0.1, 0.1),
         batch_size: int = 64,
     ) -> None:
-        """Initialize a `SiliconDataModule`.
+        """Initialize a DataModule containing barium titenate dataset.
 
         :param traj_file: The data directory. Defaults to `"data/"`.
         :param train_val_test_split: The train, validation and test split.
@@ -100,7 +100,7 @@ class BtoDataModule(reax.DataModule):
                 all_val.extend(val)
                 all_test.extend(test)
 
-            global_include = [keys.EXTERNAL_ELECTRIC_FIELD]
+            global_include = []
             atom_include = []
             for tensor in self._tensors:
                 if tensor in atomic:
@@ -225,8 +225,6 @@ def get_structures(root_dir: pathlib.Path, tensors: Iterable[str]) -> list[ase.A
             for tensor in tensors:
                 tens = get_tensors(root_dir, tensor, structure_number)
                 structure.arrays[tensor] = tens
-
-            structure.arrays[keys.EXTERNAL_ELECTRIC_FIELD] = np.zeros(3)
         except FileNotFoundError:
             continue
 

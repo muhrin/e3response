@@ -77,19 +77,20 @@ model:
     - _target_: tensorial.gcnn.NodewiseReduce
       field: predicted_energy
       out_field: predicted_energy  # Global energy
+      as_array: True               # Convert IrrepsArray to array
 
-    # Polarization
-    #    - _target_: e3response.electric.Polarization
-    #      _partial_: True
-    #
+    #      # Polarization
+    #      -  _target_: e3response.electric.Polarization
+    #         _partial_: True
+
     # Dielectric tensor
     - _target_: e3response.electric.DielectricTensor
       _partial_: True
 
-    #    # Born effective charges
+    # Born effective charges
     - _target_: e3response.electric.BornCharges
       _partial_: True
 
-    #    # Raman tensors
+    # Raman tensors
     - _target_: e3response.electric.RamanTensors
       _partial_: True
