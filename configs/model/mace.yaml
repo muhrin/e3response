@@ -15,12 +15,14 @@ loss_fn:
   weights: [ 1000., 1. ]
   loss_fns:
     - _target_: tensorial.gcnn.Loss
-      field: nodes.born_charges_predicted
-      target_field: nodes.born_charges
+      loss_fn: squared_error
+      targets: nodes.born_charges
+      predictions: nodes.born_charges_predicted
 
     - _target_: tensorial.gcnn.Loss
-      field: nodes.raman_tensors_predicted
-      target_field: nodes.raman_tensors
+      loss_fn: squared_error
+      predictions: nodes.raman_tensors_predicted
+      targets: nodes.raman_tensors
 
 
 model:

@@ -2,6 +2,7 @@ from collections.abc import Callable
 
 import jax
 import jraph
+import optax
 from tensorial import gcnn
 from tensorial.gcnn import atomic
 from tensorial.gcnn.keys import predicted
@@ -23,37 +24,61 @@ def response_loss(
     if energy:
         weights.append(1.0 if isinstance(energy, bool) else energy)
         loss_terms.append(
-            gcnn.Loss(f"globals.{predicted(atomic.TOTAL_ENERGY)}", f"globals.{atomic.TOTAL_ENERGY}")
+            gcnn.Loss(
+                optax.squared_error,
+                f"globals.{atomic.TOTAL_ENERGY}",
+                f"globals.{predicted(atomic.TOTAL_ENERGY)}",
+            )
         )
 
     if forces:
         weights.append(1.0 if isinstance(forces, bool) else forces)
-        loss_terms.append(gcnn.Loss(f"nodes.{predicted(atomic.FORCES)}", f"nodes.{atomic.FORCES}"))
+        loss_terms.append(
+            gcnn.Loss(
+                optax.squared_error,
+                f"nodes.{atomic.FORCES}",
+                f"nodes.{predicted(atomic.FORCES)}",
+            )
+        )
 
     if born_charges:
         weights.append(1.0 if isinstance(born_charges, bool) else born_charges)
         loss_terms.append(
-            gcnn.Loss(f"nodes.{predicted(keys.BORN_CHARGES)}", f"nodes.{keys.BORN_CHARGES}")
+            gcnn.Loss(
+                optax.squared_error,
+                f"nodes.{keys.BORN_CHARGES}",
+                f"nodes.{predicted(keys.BORN_CHARGES)}",
+            )
         )
 
     if polarization_tensors:
         weights.append(1.0 if isinstance(polarization_tensors, bool) else polarization_tensors)
         loss_terms.append(
-            gcnn.Loss(f"globals.{predicted(keys.POLARIZATION)}", f"globals.{keys.POLARIZATION}")
+            gcnn.Loss(
+                optax.squared_error,
+                f"globals.{keys.POLARIZATION}",
+                f"globals.{predicted(keys.POLARIZATION)}",
+            )
         )
 
     if dielectric_tensor:
         weights.append(1.0 if isinstance(dielectric_tensor, bool) else dielectric_tensor)
         loss_terms.append(
             gcnn.Loss(
-                f"globals.{predicted(keys.DIELECTRIC_TENSOR)}", f"globals.{keys.DIELECTRIC_TENSOR}"
+                optax.squared_error,
+                f"globals.{keys.DIELECTRIC_TENSOR}",
+                f"globals.{predicted(keys.DIELECTRIC_TENSOR)}",
             )
         )
 
     if raman_tensors:
         weights.append(1.0 if isinstance(raman_tensors, bool) else raman_tensors)
         loss_terms.append(
-            gcnn.Loss(f"nodes.{predicted(keys.RAMAN_TENSORS)}", f"nodes.{keys.RAMAN_TENSORS}")
+            gcnn.Loss(
+                optax.squared_error,
+                f"nodes.{keys.RAMAN_TENSORS}",
+                f"nodes.{predicted(keys.RAMAN_TENSORS)}",
+            )
         )
 
     if not loss_terms:
