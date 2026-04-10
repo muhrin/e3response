@@ -39,7 +39,7 @@ class BtoDataModule(reax.DataModule):
             "BTO_Pm-3m_5atoms_400K_3x3x3_ensemble.tar.gz",
             "BTO_Pm-3m_5atoms_800K_3x3x3.tar.gz",
         ),
-        tensors: tuple[str] = ("raman_tensors", "born_charges", "dielectric"),
+        tensors: tuple[str, ...] = ("raman_tensors", "born_charges", "dielectric"),
         train_val_test_split: Sequence[int | float] = (0.8, 0.1, 0.1),
         batch_size: int = 64,
     ) -> None:
@@ -152,7 +152,7 @@ class BtoDataModule(reax.DataModule):
 
         return gcnn.data.GraphLoader(
             self.data_train,
-            batch_size=self._batch_size,
+            batch_size=self.batch_size_per_device,
             padding=self._max_padding,
             pad=True,
         )

@@ -26,7 +26,7 @@ def test_load_train(model):
             rngs=trainer.rngs,
             datamodule=datamodule,
         )
-        trainer._run_stage(from_data)
+        trainer.run(from_data)
 
         module = tensorial.config.instantiate(cfg["model"])
         assert isinstance(module, tensorial.ReaxModule)
