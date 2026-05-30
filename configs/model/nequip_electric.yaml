@@ -1,25 +1,28 @@
 _target_: tensorial.ReaxModule
 
-jit: True
-
 optimizer:
   _partial_: True
   _target_: optax.adam
   learning_rate: 0.001
-#
-#scheduler:
-#  _target_: optax.schedules.cosine_decay_schedule
-#  init_value: 0.1
-#  decay_steps: 100
+
+scheduler:
+  _target_: optax.schedules.cosine_decay_schedule
+  init_value: 0.1
+  decay_steps: 100
 
 loss_fn:
-  _target_: e3response.losses.response_loss
-  energy: false
-  forces: false
-  dielectric_tensor: true
-  born_charges: true
-  raman_tensors: true
+  _target_: tensorial.gcnn.WeightedLoss
+  weights: [ 1000., 1. ]
+  loss_fns:
+    - _target_: tensorial.gcnn.Loss
+      loss_fn: squared_error
+      predictions: nodes.born_charges_predicted
+      targets: nodes.born_charges
 
+    - _target_: tensorial.gcnn.Loss
+      loss_fn: squared_error
+      predictions: nodes.raman_tensors_predicted
+      targets: nodes.raman_tensors
 
 model:
   _target_: tensorial.nn.Sequential
@@ -33,9 +36,8 @@ model:
           _target_: tensorial.tensors.OneHot
           num_classes: ${from_data.n_elements}
         globals.external_electric_field:
-          _target_: tensorial.tensors.SphericalHarmonic
-          irreps: 0e + 1o
-          normalise: True
+          _target_: tensorial.tensors.AsIrreps
+          irreps: 1x1e
 
     - _target_: tensorial.gcnn.EdgeVectors
 
@@ -71,26 +73,41 @@ model:
 
     - _target_: tensorial.gcnn.NodewiseLinear
       irreps_out: 1x0e
-      out_field: predicted_energy # Per-atom energy
+      out_field: energy # Per-atom energy
 
-    # Final total energy
     - _target_: tensorial.gcnn.NodewiseReduce
-      field: predicted_energy
-      out_field: predicted_energy  # Global energy
-      as_array: True               # Convert IrrepsArray to array
+      field: energy
+      out_field: predicted_energy  # Total energy
 
-    #      # Polarization
-    #      -  _target_: e3response.electric.Polarization
-    #         _partial_: True
+    # Per-atom Born effective charge tensor
+    - _target_: tensorial.gcnn.NodewiseLinear
+      irreps_out: 1x0e + 1x1e + 1x2e
+      out_field: born_charges_predicted
 
-    # Dielectric tensor
-    - _target_: e3response.electric.DielectricTensor
-      _partial_: True
+    # Per-atom Born effective charge tensor
+    - _target_: tensorial.gcnn.NodewiseLinear
+      irreps_out: 1x0e + 1x1e + 1x2e
+      out_field: born_charges_predicted
 
-    # Born effective charges
-    - _target_: e3response.electric.BornCharges
-      _partial_: True
+    - _target_: tensorial.gcnn.NodewiseDecoding
+      in_field: born_charges_predicted
+      attrs:
+        born_charges_predicted:
+          _target_: tensorial.CartesianTensor
+          formula: ij
+          i: 1o
+          j: 1o
 
-    # Raman tensors
-    - _target_: e3response.electric.RamanTensors
-      _partial_: True
+    # Per atom Raman tensors
+    - _target_: tensorial.gcnn.NodewiseLinear
+      irreps_out: 2x1o + 1x2o + 1x3o
+      out_field: raman_tensors_predicted
+
+    - _target_: tensorial.gcnn.NodewiseDecoding
+      in_field: raman_tensors_predicted
+      attrs:
+        raman_tensors_predicted:
+          _target_: tensorial.CartesianTensor
+          formula: ijk=ikj
+          i: 1o
+          j: 1o

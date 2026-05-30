@@ -21,7 +21,7 @@ __all__ = ("BtoDataModule",)
 
 _LOGGER = logging.getLogger(__name__)
 
-atomic = ("raman_tensors", "born_charges")
+atomic = "raman_tensors", "born_charges"
 global_tensors = ("dielectric",)
 
 
@@ -34,7 +34,7 @@ class BtoDataModule(reax.DataModule):
     def __init__(
         self,
         r_max: float,
-        data_dir: str | pathlib.Path = "data/bto/",
+        data_dir: str | pathlib.Path = "data/bto",
         archives: Sequence[str] = (
             "BTO_Pm-3m_5atoms_400K_3x3x3_ensemble.tar.gz",
             "BTO_Pm-3m_5atoms_800K_3x3x3.tar.gz",
