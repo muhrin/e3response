@@ -13,7 +13,16 @@ sweep:
   subdir: ${hydra.job.num}
 
 job_logging:
+  filters:
+    rank_filter:
+      (): tensorial.reaxkit.utils.RankFilter
+  formatters:
+    colorlog:
+      format: "[%(cyan)s%(asctime)s%(reset)s][%(log_color)s%(levelname)s%(reset)s][rank:%(rank)s] %(message)s"
   handlers:
+    console:
+      filters: [rank_filter]
     file:
       # Incorporates fix from https://github.com/facebookresearch/hydra/pull/2242
       filename: ${hydra.runtime.output_dir}/${task_name}.log
+      filters: [rank_filter]  # attach the filter

@@ -24,7 +24,6 @@ keywords = ['machine learning', 'e3nn-jax', 'physics']
 requires-python = '>=3.10'
 dependencies = [
     "ase",
-    "e3md",
     "hydra-core",
     "hydra_colorlog",
     'jax',
@@ -32,7 +31,6 @@ dependencies = [
     'jraph',
     'orbax-checkpoint',
     'e3nn-jax',
-    "equinox",
     "reax>=0.2,<0.7",
     "tensorial~=0.6",
     "pymatgen",

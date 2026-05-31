@@ -42,6 +42,7 @@ class BtoDataModule(reax.DataModule):
         tensors: tuple[str, ...] = ("raman_tensors", "born_charges", "dielectric"),
         train_val_test_split: Sequence[int | float] = (0.8, 0.1, 0.1),
         batch_size: int = 64,
+        include_electric_field=False,
     ) -> None:
         """Initialize a DataModule containing barium titenate dataset.
 
@@ -58,6 +59,7 @@ class BtoDataModule(reax.DataModule):
         self._tensors = tensors
         self._train_val_test_split: Final[Sequence[int | float]] = train_val_test_split
         self._batch_size: Final[int] = batch_size
+        self._include_electric_field: Final[bool] = include_electric_field
 
         # State
         self.batch_size_per_device = batch_size
@@ -87,7 +89,7 @@ class BtoDataModule(reax.DataModule):
             for archive in self._archives:
                 output_dir = self._extract_tarball(archive)
 
-                structures = get_structures(output_dir, self._tensors)
+                structures = get_structures(output_dir, self._tensors, self._include_electric_field)
                 if not structures:
                     _LOGGER.warning("No structure extracted from archive `%s`, skipping", archive)
                     continue
@@ -112,6 +114,9 @@ class BtoDataModule(reax.DataModule):
                         f"Unknown tensor type name '{tensor}', choose from "
                         f"{atomic + global_tensors}"
                     )
+
+            if self._include_electric_field:
+                global_include.append(keys.EXTERNAL_ELECTRIC_FIELD)
 
             to_graph: Callable[[ase.Atoms], jraph.GraphsTuple] = functools.partial(
                 gcnn.atomic.graph_from_ase,
@@ -212,7 +217,9 @@ def get_tensors(root_dir: pathlib.Path, tensor_type: str, index: str) -> np.ndar
     return np.load(f"{root_dir}/{tensor_type}/{index}.npy")
 
 
-def get_structures(root_dir: pathlib.Path, tensors: Iterable[str]) -> list[ase.Atoms]:
+def get_structures(
+    root_dir: pathlib.Path, tensors: Iterable[str], include_electric_field: bool = False
+) -> list[ase.Atoms]:
     structures_dir = pathlib.Path(root_dir) / "structures" / "cif"
     _LOGGER.info("Loading structures from: %s", structures_dir.absolute())
 
@@ -225,6 +232,9 @@ def get_structures(root_dir: pathlib.Path, tensors: Iterable[str]) -> list[ase.A
             for tensor in tensors:
                 tens = get_tensors(root_dir, tensor, structure_number)
                 structure.arrays[tensor] = tens
+
+            if include_electric_field:
+                structure.arrays[keys.EXTERNAL_ELECTRIC_FIELD] = np.zeros(3)
         except FileNotFoundError:
             continue
 

@@ -3,12 +3,24 @@ _target_: tensorial.ReaxModule
 optimizer:
   _partial_: True
   _target_: optax.adam
-  learning_rate: 0.001
+  learning_rate: 0.01
 
-scheduler:
-  _target_: optax.schedules.cosine_decay_schedule
-  init_value: 0.1
-  decay_steps: 100
+#scheduler:
+#  _target_: optax.schedules.cosine_decay_schedule
+#  init_value: 0.1
+#  decay_steps: 400
+
+metrics:
+  BEC:
+    _target_: tensorial.gcnn.graph_metric
+    metric: rmse
+    predictions: nodes.born_charges_predicted
+    targets: nodes.born_charges
+  raman:
+    _target_: tensorial.gcnn.graph_metric
+    metric: rmse
+    predictions: nodes.raman_tensors_predicted
+    targets: nodes.raman_tensors
 
 loss_fn:
   _target_: tensorial.gcnn.WeightedLoss
