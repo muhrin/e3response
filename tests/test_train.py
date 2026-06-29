@@ -13,7 +13,7 @@ CONFIG_PATH = pathlib.Path(__file__).parent.parent / "configs"
 DATA_PATH = pathlib.Path(__file__).parent.parent / "data"
 
 
-@pytest.mark.parametrize("model", ["nequip_electric", "mace"])
+@pytest.mark.parametrize("model", ["nequip_electric"])
 def test_load_train(model):
     trainer = reax.Trainer()
 

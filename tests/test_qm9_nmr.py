@@ -10,7 +10,7 @@ mock_dir = Path(__file__).parent / "mock_datasets" / "qm9_nmr"
 
 
 @pytest.mark.parametrize("dataset_name", list(DATASET_URLS.keys()))
-def test_qm9_nmr_dataset(dataset_name, test_engine):
+def test_qm9_nmr_dataset(dataset_name):
     dataset = Qm9NmrDataset(
         dataset=dataset_name,
         atom_keys=["species", "anisotropy"],

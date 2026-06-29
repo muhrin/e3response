@@ -29,7 +29,6 @@ dependencies = [
     'jax',
     'jaxlib',
     'jraph',
-    'orbax-checkpoint',
     'e3nn-jax',
     "reax>=0.2,<0.7",
     "tensorial~=0.6",

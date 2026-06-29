@@ -40,9 +40,9 @@ from_data:
   atomic_numbers: atomic/all_atomic_numbers
   avg_num_neighbours: atomic/avg_num_neighbours
   force_scale: atomic/force_std
-  energy_shifts:
-    _target_: tensorial.gcnn.atomic.EnergyContributionLstsq
-    type_map: ${from_data.atomic_numbers}
+#  energy_shifts:
+#    _target_: tensorial.gcnn.atomic.EnergyContributionLstsq
+#    type_map: ${from_data.atomic_numbers}
 
 # set False to skip model training
 train:

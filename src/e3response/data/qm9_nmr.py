@@ -212,6 +212,7 @@ class Qm9NmrDataset(collections.abc.Sequence[jraph.GraphsTuple]):
                     mode="w", suffix=".log", encoding="utf-8"
                 ) as tmp_log:
                     tmp_log.write(data.decode("utf-8"))
+                    tmp_log.flush()
                     tmp_log_path = tmp_log.name
 
                     structures.append(get_structure_and_data_from_log(pathlib.Path(tmp_log_path)))
