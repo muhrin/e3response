@@ -68,6 +68,7 @@ def test_qm9_nmr_datamodule(dataset_name, test_engine):
             logger=None,
             on_step=None,
             on_epoch=None,
+            reduce_fn: "reax.types.ReduceFn" = "mean",
         ):
             pass
 

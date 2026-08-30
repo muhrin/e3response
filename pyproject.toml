@@ -76,9 +76,6 @@ exclude = [
     'test/',
 ]
 
-[tool.flit.external-data]
-directory = "configs"
-
 [tool.flynt]
 line-length = 100
 fail-on-change = true
