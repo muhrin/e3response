@@ -311,9 +311,11 @@ def get_structure_and_data_from_log(log_path: pathlib.Path) -> ase.Atoms | None:
             return None
 
         atoms = pymatgen.io.ase.AseAtomsAdaptor.get_atoms(molecule_data["structure"])
+        assert isinstance(atoms, pymatgen.io.ase.Atoms)
 
         ind = molecule_data["ind"]
         n_atoms = molecule_data["N"]
+        assert isinstance(n_atoms, int), "The number of atoms is not an integer."
 
         tensors = np.zeros((n_atoms, 3, 3))
         tensors[ind] = molecule_data["tensor"]

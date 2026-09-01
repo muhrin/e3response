@@ -4,7 +4,7 @@
 # order of defaults determines the order in which examples override each other
 defaults:
   - _self_
-  - data: bto
+  - data: qm9_nmr
   - model: nequip_deriv
   - listeners: default
   - logger: csv # set logger here or use command line (e.g. `e3response train logger=tensorboard`)

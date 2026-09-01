@@ -25,11 +25,11 @@ atomic = "raman_tensors", "born_charges"
 global_tensors = ("dielectric",)
 
 
-class BtoDataModule(reax.DataModule):
+class BtoDataModule(reax.DataModule[jraph.GraphsTuple, jraph.GraphsTuple]):
     """A barium titanate dataset containing various tensorial quantities created by Lorenzo
     Bastonero"""
 
-    _max_padding: gcnn.data.GraphPadding = None
+    _max_padding: gcnn.data.GraphPadding
 
     def __init__(
         self,
@@ -145,7 +145,7 @@ class BtoDataModule(reax.DataModule):
             self.data_test = test_graphs
 
     @override
-    def train_dataloader(self) -> reax.DataLoader:
+    def train_dataloader(self) -> reax.DataLoader[jraph.GraphsTuple, jraph.GraphsTuple]:
         """Create and return the train dataloader.
 
         :return: The train dataloader.
@@ -227,6 +227,8 @@ def get_structures(
     for filename in structures_dir.iterdir():
         try:
             structure = ase.io.read(filename, format="cif")
+            assert isinstance(structure, ase.Atoms), "ase.io.read did not return ase.Atoms"
+
             structure_number = re.findall(r"\d\d\d\d\d", filename.name)[0]
 
             for tensor in tensors:

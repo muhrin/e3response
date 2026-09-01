@@ -9,7 +9,7 @@ from tensorial import reaxkit as rkit
 import e3response
 import e3response.data
 
-CONFIG_PATH = pathlib.Path(__file__).parent.parent / "examples"
+CONFIG_PATH = pathlib.Path(__file__).parent.parent / "configs"
 DATA_PATH = pathlib.Path(__file__).parent.parent / "data"
 
 
