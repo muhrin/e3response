@@ -1157,7 +1157,7 @@ requires-dist = [
     { name = "pymatgen" },
     { name = "pytest", marker = "extra == 'dev'" },
     { name = "pytest-cov", marker = "extra == 'dev'" },
-    { name = "reax", specifier = ">=0.6.13,<0.7" },
+    { name = "reax", specifier = ">=0.6.14,<0.7" },
     { name = "sphinx", marker = "extra == 'docs'" },
     { name = "sphinx-autobuild", marker = "extra == 'docs'" },
     { name = "tensorial", specifier = "~=0.6" },
@@ -3968,11 +3968,11 @@ wheels = [
 
 [[package]]
 name = "platformdirs"
-version = "4.11.6"
+version = "4.11.7"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/8e/1d/6e762a6b060e662208951aefc5c39f6a96a272c4a10c0c1f7b6113fc3c09/platformdirs-4.11.6.tar.gz", hash = "sha256:1a4016e373f89f8ec458431fe0e0c5c4285858ac623f3e20efdfcbc0bd862941", size = 35131, upload-time = "2026-09-01T04:41:00.6Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/69/b7/802a56eca9f2fac455b8bab5375a2647b0f0e14a2cd63ef077de3c4a7658/platformdirs-4.11.7.tar.gz", hash = "sha256:4f41487eeeeeb07f3a6625e61d9bc0ae6809f92d3386dbd74392fbb76108104d", size = 35127, upload-time = "2026-09-01T13:35:10.502Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/4e/d8/2784c6eabb991b5b7494ff9e9888c74a0a72ad613c3ec5adbfcecc0724c7/platformdirs-4.11.6-py3-none-any.whl", hash = "sha256:b22d992e863bc651c26b16242041c7979db6e3286e548f9a76cc91238fac599e", size = 23938, upload-time = "2026-09-01T04:40:58.977Z" },
+    { url = "https://files.pythonhosted.org/packages/27/6e/80993e10a0482f630cef528635789233224f36b1ffd11592aa15d13ff9ce/platformdirs-4.11.7-py3-none-any.whl", hash = "sha256:8a02cb259042c79d1cd0450facc2fe6dc9d303ae7901afbe33bf8ea0b188cef6", size = 23938, upload-time = "2026-09-01T13:35:09.02Z" },
 ]
 
 [[package]]
@@ -4714,7 +4714,7 @@ wheels = [
 
 [[package]]
 name = "reax"
-version = "0.6.13"
+version = "0.6.14"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "beartype" },
@@ -4738,9 +4738,9 @@ dependencies = [
     { name = "tqdm" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/66/db/75e5ce80fdb8366d6cdcf304ecf32330e760bf1cdb1b9c53d8aca9568503/reax-0.6.13.tar.gz", hash = "sha256:ad232c79228ff05068df82776957c778f442aefc9e0cd384b700d7d365afb651", size = 138303, upload-time = "2026-08-31T12:50:01.104Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/b8/83/4c0902b0b49dc1b226e61b87d1667bd92bc6da9ed278be95a846ad21caad/reax-0.6.14.tar.gz", hash = "sha256:4ea7064e6e4f3aceeda12fa47c7d6b5058a06da04daab3b98a1ad02d6d287f3b", size = 138466, upload-time = "2026-09-02T11:07:48.504Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/85/f5/b247196a63c29fee355bc5eb14115a321d4d0a3d842f417e5405ace9e486/reax-0.6.13-py3-none-any.whl", hash = "sha256:e4e73139dfe865f3f73ccd45096e44f2495cc532de4b535f6e068673ef60b2b8", size = 179780, upload-time = "2026-08-31T12:49:59.795Z" },
+    { url = "https://files.pythonhosted.org/packages/e7/bf/3eafc9d5bad011be5c27aa403ccd185b4433bcfad81b677a9be0850d42b1/reax-0.6.14-py3-none-any.whl", hash = "sha256:16c205b86ef952c93cc32afc8aed47bdb6872e3e806620b5520e28366e30cad2", size = 180046, upload-time = "2026-09-02T11:07:47.14Z" },
 ]
 
 [[package]]
@@ -6154,7 +6154,7 @@ wheels = [
 
 [[package]]
 name = "virtualenv"
-version = "21.7.7"
+version = "21.7.8"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "distlib" },
@@ -6163,9 +6163,9 @@ dependencies = [
     { name = "python-discovery" },
     { name = "typing-extensions", marker = "python_full_version < '3.11'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/79/41/c3f34799487924f2a6f43b8a8b7acd345a6c61aac2211d4bced8621ca4f1/virtualenv-21.7.7.tar.gz", hash = "sha256:6874376f99ba6b8d4e3ee8bde67f9285412400c7d5b29ba41ee6daa5e0221bdc", size = 5347022, upload-time = "2026-08-28T18:59:50.093Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/08/1c/69faa2e6a83484e2a8227bce5cfaa183941c5720f99c48f204931d286b07/virtualenv-21.7.8.tar.gz", hash = "sha256:1dc49c790072a9072cb1803f9bd62aa69cd583077cada32390f75505cdc64c9b", size = 5347580, upload-time = "2026-09-01T13:36:13.894Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/95/f8/dcec8dc767b812193316c7debed1e2b53e586e59c267bfe517688ff90275/virtualenv-21.7.7-py3-none-any.whl", hash = "sha256:67a6a68fef3ad8ca16b8b89f33fd8f97996cc0bf0db31629d07ecf8dec539a2c", size = 5324620, upload-time = "2026-08-28T18:59:48.056Z" },
+    { url = "https://files.pythonhosted.org/packages/9f/34/88d507d4a4030fa559788de9c690a214f9a4053aa1d91cfb60e9b36127c2/virtualenv-21.7.8-py3-none-any.whl", hash = "sha256:3040eb3cbf5d32b10ffd57d167e6a162237ad82ba7d8cf1400a1efed593d85ac", size = 5324617, upload-time = "2026-09-01T13:36:11.248Z" },
 ]
 
 [[package]]
