@@ -4,7 +4,7 @@ import reax
 
 from . import config, data, electric, keys
 
-__version__ = "0.1.2"
+__version__ = "0.1.3.dev1"
 
 __all__ = (
     "data",
