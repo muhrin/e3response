@@ -13,10 +13,10 @@ model:
     _target_: optax.adam
     learning_rate: 0.001
 
-  scheduler:
-    _target_: optax.schedules.cosine_decay_schedule
-    init_value: 0.1
-    decay_steps: 100
+#  scheduler:
+#    _target_: optax.schedules.cosine_decay_schedule
+#    init_value: 0.1
+#    decay_steps: 100
 
   loss_fn:
     _target_: tensorial.gcnn.WeightedLoss

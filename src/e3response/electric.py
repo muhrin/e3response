@@ -77,7 +77,7 @@ class Polarization(linen.Module):
         self._calc = gcnn.diff(
             self.energy_fn,
             f"globals.{self.energy_key}:gk",
-            wrt=[f"globals.{self.electric_field_key}:α"],
+            wrt=[f"globals.{self.electric_field_key}:gα"],
             at={f"globals.{self.electric_field_key}": jnp.zeros(3)},
             out=":gα",
             return_graph=True,
@@ -168,7 +168,7 @@ class DielectricTensor(linen.Module):
         self._calc = gcnn.diff(
             self.energy_fn,
             f"globals.{self.energy_key}:gk",
-            wrt=[f"globals.{self.electric_field_key}:α", f"globals.{self.electric_field_key}:β"],
+            wrt=[f"globals.{self.electric_field_key}:gα", f"globals.{self.electric_field_key}:gβ"],
             at={f"globals.{self.electric_field_key}": jnp.zeros(3)},
             out=":gαβ",
             return_graph=True,
@@ -245,7 +245,7 @@ class BornCharges(linen.Module):
         self._diff_fn = gcnn.diff(
             self.energy_fn,
             f"globals.{self.energy_key}:gk",
-            wrt=[f"globals.{self.electric_field_key}:α", f"nodes.{keys.POSITIONS}:Iγ"],
+            wrt=[f"globals.{self.electric_field_key}:gα", f"nodes.{keys.POSITIONS}:Iγ"],
             at={f"globals.{self.electric_field_key}": jnp.zeros(3)},
             out=":Iαγ",
             return_graph=True,
@@ -309,8 +309,8 @@ class RamanTensors(linen.Module):
             self.energy_fn,
             f"globals.{self.energy_key}:gk",
             wrt=[
-                f"globals.{self.electric_field_key}:α",
-                f"globals.{self.electric_field_key}:β",
+                f"globals.{self.electric_field_key}:gα",
+                f"globals.{self.electric_field_key}:gβ",
                 f"nodes.{keys.POSITIONS}:Iγ",
             ],
             at={f"globals.{self.electric_field_key}": jnp.zeros(3)},

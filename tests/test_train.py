@@ -23,7 +23,6 @@ def test_load_train(model):
         from_data = rkit.FromData(
             cfg["from_data"],
             engine=trainer.engine,
-            rngs=trainer.rngs,
             datamodule=datamodule,
         )
         trainer.run(from_data)

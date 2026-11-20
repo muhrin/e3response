@@ -68,7 +68,7 @@ class BtoDataModule(reax.DataModule[jraph.GraphsTuple, jraph.GraphsTuple]):
         self.data_test: reax.data.Dataset | None = None
 
     @override
-    def setup(self, stage: "reax.Stage", /) -> None:
+    def setup(self, engine: "reax.Engine", /, *, stage: str | None = None) -> None:
         """Load data. Set variables: `self.data_train`, `self.data_val`, `self.data_test`.
 
         This method is called by REAX before `trainer.fit()`, `trainer.validate()`,
@@ -96,7 +96,7 @@ class BtoDataModule(reax.DataModule[jraph.GraphsTuple, jraph.GraphsTuple]):
 
                 # Split up the graphs into sets
                 train, val, test = reax.data.random_split(
-                    stage.rngs, dataset=structures, lengths=self._train_val_test_split
+                    engine.rngs, dataset=structures, lengths=self._train_val_test_split
                 )
                 all_train.extend(train)
                 all_val.extend(val)
@@ -133,7 +133,6 @@ class BtoDataModule(reax.DataModule[jraph.GraphsTuple, jraph.GraphsTuple]):
             calc_padding = functools.partial(
                 gcnn.data.GraphBatcher.calculate_padding,
                 batch_size=self._batch_size,
-                with_shuffle=True,
             )
 
             paddings = list(map(calc_padding, (train_graphs, val_graphs, test_graphs)))

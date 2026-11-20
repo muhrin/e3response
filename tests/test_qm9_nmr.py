@@ -47,32 +47,7 @@ def test_qm9_nmr_datamodule(dataset_name, test_engine):
         dataset=dataset_name, train_val_test_split=(0.6, 0.2, 0.2), batch_size=1, data_dir=mock_dir
     )
 
-    class DummyStage(reax.Stage):
-        def __init__(self):
-            super().__init__(
-                name="dummystage",
-                module=None,
-                engine=test_engine,
-                rngs=test_engine.rngs,
-            )
-
-        def _step(self):
-            return {}
-
-        def log(
-            self,
-            name,
-            value,
-            batch_size=None,
-            prog_bar=None,
-            logger=None,
-            on_step=None,
-            on_epoch=None,
-            reduce_fn: "reax.types.ReduceFn" = "mean",
-        ):
-            pass
-
-    dm.setup(DummyStage())
+    dm.setup(test_engine, stage="fit")
 
     for loader_fn in ["train_dataloader", "val_dataloader", "test_dataloader"]:
         loader = getattr(dm, loader_fn)()
@@ -104,5 +79,7 @@ def test_qm9_nmr_datamodule(dataset_name, test_engine):
         mu = batch.nodes["mu"]
 
         assert isinstance(mu, np.ndarray), f"'mu' in {loader_fn} is not a numpy array"
-        assert mu.ndim == 1, f"'mu' in {loader_fn} has wrong shape {mu.shape}, expected 1D array"
+        assert (
+            mu.ndim == 2 and mu.shape[1] == 1
+        ), f"'mu' in {loader_fn} has wrong shape {mu.shape}, expected 1D array"
         assert not np.any(np.isnan(mu)), f"'mu' in {loader_fn} contains NaNs"

@@ -24,7 +24,7 @@ metrics:
 
 loss_fn:
   _target_: tensorial.gcnn.WeightedLoss
-  weights: [ 1000., 1. ]
+  weights: [ 100., 1. ]
   loss_fns:
     - _target_: tensorial.gcnn.Loss
       loss_fn: squared_error
@@ -59,6 +59,7 @@ model:
 
     - _target_: tensorial.gcnn.RadialBasisEdgeEncoding
       r_max: ${r_max}
+      envelope: True
 
     - _target_: tensorial.gcnn.NodewiseLinear
       field: attributes
@@ -76,7 +77,6 @@ model:
       irreps_out: 16x0o + 16x0e + 16x1o + 16x1e
       avg_num_neighbours: ${from_data.avg_num_neighbours}
 
-    # Keep only scalars and reduce the number passing this point
     - _target_: tensorial.gcnn.NodewiseLinear
       irreps_out: 4x0e + 4x0o + 4x1e + 4x1o + 4x2e + 4x2o + 2x3o + 2x3e
 
